@@ -45,8 +45,9 @@ jobs:
       run: mvn -B package --file pom.xml -DskipTests
     - name: Create and upload package
       run: | 
-        find . -type f -name "*.jar"
-        mkdir staging && find . -type f -name "*.jar" | xargs cp -t staging
+        mkdir staging 
+        cp ./edms-aio-platform/target/edms-aio-platform-1.0-SNAPSHOT.jar staging
+        cp ./edms-aio-share/target/edms-aio-share-1.0-SNAPSHOT.jar staging
     - uses: actions/upload-artifact@v4
       with:
         name: Package
