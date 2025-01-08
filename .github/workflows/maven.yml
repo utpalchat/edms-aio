@@ -12,6 +12,8 @@ on:
   push:
     branches: [ "stage" ]
   workflow_dispatch:
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -58,6 +60,6 @@ jobs:
         git config --global user.name "UtpalChatterjee-gsa"
         git config --global user.email "utpal.chatterjee@gsa.gov"
         echo '${{ steps.artifact-upload-step.outputs.artifact-url }}' > artifact-url.txt
-        git add .
+        git add artifact-url.txt
         git commit -m "added / mofified artifact-url.txt"
         git push
