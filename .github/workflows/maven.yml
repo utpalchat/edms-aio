@@ -44,27 +44,30 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      id: maven_build
       continue-on-error: true
       run: | 
         mvn -B package --file pom.xml -DskipTests
     - name: Create and upload package
+      id: create
       continue-on-error: true
       run: | 
         mkdir staging 
         cp ./edms-aio-platform/target/edms-aio-platform-1.0-SNAPSHOT.jar staging
         cp ./edms-aio-share/target/edms-aio-share-1.0-SNAPSHOT.jarrrr staging
+    - name: Upload Artifact
+      id: artifact-upload
+      continue-on-error: true
+      if: steps.create.outcome == 'success'
     - uses: actions/upload-artifact@v4
-      id: artifact-upload-step
       with:
         name: Package
         path: staging
     - name: Output artifact URL
-      if: steps.artifact-upload-step.outcome == 'success'
+      if: steps.artifact-upload.outcome == 'success'
       run: echo '${{ steps.artifact-upload-step.outputs.artifact-url }}' > artifact-url.txt
     - name: Output artifact URL FAILED
-      if: steps.artifact-upload-step.outcome != 'success'
-      run: echo '${{ steps.artifact-upload-step.outputs.artifact-url }}' > artifact-url.txt
+      if: steps.artifact-upload.outcome != 'success' || steps.create.outcome != 'success'
+      run: echo 'FAILED' > artifact-url.txt
     - name: Commit artifact-url.txt file
       run:  |
         git config --global user.name "UtpalChatterjee-gsa"
