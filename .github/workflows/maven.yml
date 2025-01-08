@@ -49,6 +49,9 @@ jobs:
         cp ./edms-aio-platform/target/edms-aio-platform-1.0-SNAPSHOT.jar staging
         cp ./edms-aio-share/target/edms-aio-share-1.0-SNAPSHOT.jar staging
     - uses: actions/upload-artifact@v4
+      id: artifact-upload-step
       with:
         name: Package
         path: staging
+    - name: Output artifact ID
+      run:  echo 'Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'
