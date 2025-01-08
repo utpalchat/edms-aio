@@ -44,9 +44,9 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
+      id: maven_build
       continue-on-error: true
       run: | 
-        echo "FAILED" > artifact-url.txt
         mvn -B package --file pom.xml -DskipTests
     - name: Create and upload package
       continue-on-error: true
@@ -63,7 +63,10 @@ jobs:
       run:  |
         git config --global user.name "UtpalChatterjee-gsa"
         git config --global user.email "utpal.chatterjee@gsa.gov"
+        if: steps.artifact-upload-step.conclusion == 'success'
         echo '${{ steps.artifact-upload-step.outputs.artifact-url }}' > artifact-url.txt
+        if: steps.artifact-upload-step.conclusion != 'success'
+        echo "FAILED" > artifact-url.txt
         git add artifact-url.txt
         git commit -m "added / mofified artifact-url.txt"
         git push
