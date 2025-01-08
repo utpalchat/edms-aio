@@ -60,10 +60,10 @@ jobs:
         name: Package
         path: staging
     - name: Output artifact URL
-      if: steps.artifact-upload-step.conclusion == 'success'
+      if: steps.artifact-upload-step.outcome == 'success'
       run: echo '${{ steps.artifact-upload-step.outputs.artifact-url }}' > artifact-url.txt
     - name: Output artifact URL FAILED
-      if: steps.artifact-upload-step.conclusion != 'success'
+      if: steps.artifact-upload-step.outcome != 'success'
       run: echo '${{ steps.artifact-upload-step.outputs.artifact-url }}' > artifact-url.txt
     - name: Commit artifact-url.txt file
       run:  |
