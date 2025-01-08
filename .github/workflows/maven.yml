@@ -44,8 +44,12 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B package --file pom.xml -DskipTests
+      continue-on-error: true
+      run: | 
+        echo "FAILED" > artifact-url.txt
+        mvn -B package --file pom.xml -DskipTests
     - name: Create and upload package
+      continue-on-error: true
       run: | 
         mkdir staging 
         cp ./edms-aio-platform/target/edms-aio-platform-1.0-SNAPSHOT.jar staging
@@ -56,7 +60,6 @@ jobs:
         name: Package
         path: staging
     - name: Output artifact URL
-      continue-on-error: true
       run:  |
         git config --global user.name "UtpalChatterjee-gsa"
         git config --global user.email "utpal.chatterjee@gsa.gov"
