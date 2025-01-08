@@ -49,13 +49,14 @@ jobs:
       run: | 
         mkdir staging 
         cp ./edms-aio-platform/target/edms-aio-platform-1.0-SNAPSHOT.jar staging
-        cp ./edms-aio-share/target/edms-aio-share-1.0-SNAPSHOT.jar staging
+        cp ./edms-aio-share/target/edms-aio-share-1.0-SNAPSHOT.jarrrr staging
     - uses: actions/upload-artifact@v4
       id: artifact-upload-step
       with:
         name: Package
         path: staging
     - name: Output artifact URL
+      continue-on-error: true
       run:  |
         git config --global user.name "UtpalChatterjee-gsa"
         git config --global user.email "utpal.chatterjee@gsa.gov"
