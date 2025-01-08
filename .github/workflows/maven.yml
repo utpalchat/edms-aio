@@ -47,7 +47,7 @@ jobs:
       continue-on-error: true
       run: | 
         mvn -B package --file pom.xml -DskipTests
-    - name: Create and upload package
+    - name: Create package
       id: create
       continue-on-error: true
       run: | 
@@ -58,13 +58,13 @@ jobs:
       id: artifact-upload
       continue-on-error: true
       if: steps.create.outcome == 'success'
-    - uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v4
       with:
         name: Package
         path: staging
     - name: Output artifact URL
       if: steps.artifact-upload.outcome == 'success'
-      run: echo '${{ steps.artifact-upload-step.outputs.artifact-url }}' > artifact-url.txt
+      run: echo '${{ steps.artifact-upload.outputs.artifact-url }}' > artifact-url.txt
     - name: Output artifact URL FAILED
       if: steps.artifact-upload.outcome != 'success' || steps.create.outcome != 'success'
       run: echo 'FAILED' > artifact-url.txt
