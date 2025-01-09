@@ -63,7 +63,7 @@ jobs:
         path: staging
     - name: Output artifact URL
       if: steps.artifact-upload.outcome == 'success'
-      run: echo '${{ steps.artifact-upload.outputs.artifact-url }}' > artifact-url.txt
+      run: echo 'URL is ${{ steps.artifact-upload.outputs.artifact-url }}' > artifact-url.txt
     - name: Output artifact URL FAILED
       if: steps.artifact-upload.outcome != 'success' || steps.create.outcome != 'success'
       run: echo 'FAILED' > artifact-url.txt
