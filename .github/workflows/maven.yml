@@ -61,16 +61,24 @@ jobs:
       with:
         name: Package
         path: staging
+    - name: checkout another repo
+      uses: actions/checkout@v4
+      with:
+        repository: UtpalChatterjee-gsa/edms-dist
+        token: ${{ secrets.TOKEN }}
+        path: edms-dist
+    - name: Change directory to edms-dist
+      run: cd edms-dist
     - name: Output artifact URL
       if: steps.artifact-upload.outcome == 'success'
-      run: echo 'URL is ${{ steps.artifact-upload.outputs.artifact-url }}' > artifact-url.txt
+      run: echo 'URL is ${{ steps.artifact-upload.outputs.artifact-url }}' > artifact-url-${{ github.event.pull_request.base.ref }}.txt
     - name: Output artifact URL FAILED
       if: steps.artifact-upload.outcome != 'success' || steps.create.outcome != 'success'
-      run: echo 'FAILED' > artifact-url.txt
+      run: echo 'FAILED' > artifact-url-${{ github.event.pull_request.base.ref }}.txt
     - name: Commit artifact-url.txt file
       run:  |
         git config --global user.name "UtpalChatterjee-gsa"
         git config --global user.email "utpal.chatterjee@gsa.gov"
         git add artifact-url.txt
-        git commit -m "added / mofified artifact-url.txt"
-        git push --force
+        git commit -m "added / mofified artifact-url-${{ github.event.pull_request.base.ref }}.txt"
+        git push
