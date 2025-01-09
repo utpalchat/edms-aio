@@ -73,4 +73,4 @@ jobs:
         git config --global user.email "utpal.chatterjee@gsa.gov"
         git add artifact-url.txt
         git commit -m "added / mofified artifact-url.txt"
-        git push
+        git push --force
