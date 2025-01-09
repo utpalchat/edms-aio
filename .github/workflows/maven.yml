@@ -79,6 +79,6 @@ jobs:
       run:  |
         git config --global user.name "UtpalChatterjee-gsa"
         git config --global user.email "utpal.chatterjee@gsa.gov"
-        git add artifact-url.txt
+        git add .
         git commit -m "added / mofified artifact-url-${{ github.event.pull_request.base.ref }}.txt"
         git push
