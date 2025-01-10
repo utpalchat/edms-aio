@@ -38,9 +38,11 @@ jobs:
       output_text: ${{ steps.step_deploy.outputs.output_text }}
     if: ${{ github.event_name != 'pull_request' }}
     steps:
-    - id: output_file
+    - name: Output File name
+      id: output_file
       run: echo "output_file_name=artifact-url-${{ github.event.pull_request.base.ref }}.txt" >> "$GITHUB_OUTPUT"
-    - id: step_deploy
+    - name: Deploy
+      id: step_deploy
     - uses: actions/checkout@v4
     - name: Set up JDK 17
       uses: actions/setup-java@v4
