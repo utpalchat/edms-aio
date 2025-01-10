@@ -33,8 +33,14 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    outputs:
+      output_file_name: ${{ steps.output_file.outputs.output_file_name }}
+      output_text: ${{ steps.step_deploy.outputs.output_text }}
     if: ${{ github.event_name != 'pull_request' }}
     steps:
+    - id: output_file
+      run: echo "output_file_name=artifact-url-${{ github.event.pull_request.base.ref }}.txt" >> "$GITHUB_OUTPUT"
+    - id: step_deploy
     - uses: actions/checkout@v4
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -44,8 +50,7 @@ jobs:
         cache: maven
     - name: Build with Maven
       continue-on-error: true
-      run: | 
-        mvn -B package --file pom.xml -DskipTests
+      run: mvn -B package --file pom.xml -DskipTests
     - name: Create package
       id: create
       continue-on-error: true
@@ -61,24 +66,27 @@ jobs:
       with:
         name: Package
         path: staging
-    - name: checkout another repo
+    - name: Output artifact URL
+      if: steps.artifact-upload.outcome == 'success'
+      run: echo 'output_text=${{ steps.artifact-upload.outputs.artifact-url }}'  >> "$GITHUB_OUTPUT"
+    - name: Output artifact URL FAILED
+      if: steps.artifact-upload.outcome != 'success' || steps.create.outcome != 'success'
+      run: echo "output_text=FAILED" >> "$GITHUB_OUTPUT"
+      
+  report:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout UtpalChatterjee-gsa/edms-dist repo
       uses: actions/checkout@v4
       with:
         repository: UtpalChatterjee-gsa/edms-dist
         token: ${{ secrets.TOKEN }}
-        path: edms-dist
-    - name: Change directory to edms-dist
-      run: cd edms-dist
-    - name: Output artifact URL
-      if: steps.artifact-upload.outcome == 'success'
-      run: echo 'URL is ${{ steps.artifact-upload.outputs.artifact-url }}' > artifact-url-${{ github.event.pull_request.base.ref }}.txt
-    - name: Output artifact URL FAILED
-      if: steps.artifact-upload.outcome != 'success' || steps.create.outcome != 'success'
-      run: echo 'FAILED' > artifact-url-${{ github.event.pull_request.base.ref }}.txt
-    - name: Commit artifact-url.txt file
+    - name: Commit ${{needs.deploy.outputs.output_file_name}} file
       run:  |
+        echo ${{needs.deploy.outputs.output_text}} > ${{needs.deploy.outputs.output_file_name}}
         git config --global user.name "UtpalChatterjee-gsa"
         git config --global user.email "utpal.chatterjee@gsa.gov"
         git add .
-        git commit -m "added / mofified artifact-url-${{ github.event.pull_request.base.ref }}.txt"
+        git commit -m "added / mofified ${{needs.deploy.outputs.output_file_name}} file"
         git push
