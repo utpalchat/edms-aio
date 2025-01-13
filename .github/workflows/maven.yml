@@ -80,11 +80,11 @@ jobs:
       with:
         repository: UtpalChatterjee-gsa/edms-dist
         token: ${{ secrets.TOKEN }}
-    - name: Commit ${{needs.deploy.outputs.output_file_name}} file
+    - name: Commit ${{needs.build_artifact.outputs.output_file_name}} file
       run:  |
-        echo ${{needs.deploy.outputs.output_text}} > ${{needs.deploy.outputs.output_file_name}}
+        echo ${{needs.build_artifact.outputs.output_text}} > ${{needs.build_artifact.outputs.output_file_name}}
         git config --global user.name "UtpalChatterjee-gsa"
         git config --global user.email "utpal.chatterjee@gsa.gov"
         git add .
-        git commit -m "added / mofified ${{needs.deploy.outputs.output_file_name}} file"
+        git commit -m "added / mofified ${{needs.build_artifact.outputs.output_file_name}} file"
         git push
