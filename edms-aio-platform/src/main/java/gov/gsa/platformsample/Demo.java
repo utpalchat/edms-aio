@@ -28,6 +28,6 @@ public class Demo
 	public void init()
 	{
 		System.out.println("Platform JAR Module class has been loaded");
-		Test for error;
+		System.out.println("Error corrected!!");
 	}
 }
