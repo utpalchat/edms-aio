@@ -13,7 +13,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  build_and_test:
 
     runs-on: ubuntu-latest
 
@@ -30,8 +30,8 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
-  deploy:
-    needs: build
+  build_artifact:
+    needs: build_and_test
     runs-on: ubuntu-latest
     outputs:
       output_file_name: ${{ steps.output_file.outputs.output_file_name }}
@@ -49,18 +49,15 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      continue-on-error: true
       run: mvn -B package --file pom.xml -DskipTests
     - name: Create package
       id: create
-      continue-on-error: true
       run: | 
         mkdir staging 
         cp ./edms-aio-platform/target/edms-aio-platform-1.0-SNAPSHOT.jar staging
         cp ./edms-aio-share/target/edms-aio-share-1.0-SNAPSHOT.jar staging
     - name: Upload Package
       id: artifact-upload
-      continue-on-error: true
       if: steps.create.outcome == 'success'
       uses: actions/upload-artifact@v4
       with:
@@ -75,7 +72,7 @@ jobs:
       run: echo "output_text=FAILED" >> "$GITHUB_OUTPUT"
       
   report:
-    needs: deploy
+    needs: build_artifact
     runs-on: ubuntu-latest
     steps:
     - name: checkout UtpalChatterjee-gsa/edms-dist repo
@@ -83,11 +80,11 @@ jobs:
       with:
         repository: UtpalChatterjee-gsa/edms-dist
         token: ${{ secrets.TOKEN }}
-    - name: Commit ${{needs.deploy.outputs.output_file_name}} file
+    - name: Commit ${{needs.build_artifact.outputs.output_file_name}} file
       run:  |
-        echo ${{needs.deploy.outputs.output_text}} > ${{needs.deploy.outputs.output_file_name}}
+        echo ${{needs.build_artifact.outputs.output_text}} > ${{needs.build_artifact.outputs.output_file_name}}
         git config --global user.name "UtpalChatterjee-gsa"
         git config --global user.email "utpal.chatterjee@gsa.gov"
         git add .
-        git commit -m "added / mofified ${{needs.deploy.outputs.output_file_name}} file"
+        git commit -m "added / mofified ${{needs.build_artifact.outputs.output_file_name}} file"
         git push
